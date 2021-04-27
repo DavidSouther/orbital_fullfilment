@@ -29,14 +29,22 @@ export type Some<T> = T;
 export const None = null;
 export type Option<T> = Some<T> | typeof None;
 
+export function isNone<T>(o: Option<T>): o is null {
+  return o === None;
+}
+
+export function isSome<T>(o: Option<T>): o is Some<T> {
+  return o !== None;
+}
+
 export type Entries<T> = { [K in keyof T]: [K, T[K]] }[keyof T][];
 export function entries<T>(t: T): Entries<T> {
   return (Object.entries(t) as unknown) as Entries<T>;
 }
 
 export function clone<T extends object>(t: T): T {
-  return entries(t).reduce(
-    (t, [k, v]) => ((t[k] = v), t),
-    {} as Partial<T>
-  ) as T;
+  return entries(t).reduce((t, [k, v]) => {
+    t[k] = v;
+    return t;
+  }, {} as Partial<T>) as T;
 }
