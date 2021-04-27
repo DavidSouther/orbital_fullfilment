@@ -6,7 +6,7 @@ export const Circle: FC<{
   radius: number;
   color: string;
 }> = ({ center: { x, y }, radius, color }) =>
-  useDraw2d((context) => {
+  useDraw2d(({ context }) => {
     context.fillStyle = "transparent";
     context.strokeStyle = color;
     context.beginPath();

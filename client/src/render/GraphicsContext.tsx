@@ -1,12 +1,20 @@
 import { createContext, ReactElement, useContext, useEffect } from "react";
 import { Option, None, isNone } from "../math/constants";
 
-export const GraphicsContext = createContext<Option<CanvasRenderingContext2D>>(
-  None
-);
+export interface CanvasProperties {
+  width: number;
+  height: number;
+}
+
+export interface Graphics2D {
+  context: CanvasRenderingContext2D;
+  props: CanvasProperties;
+}
+
+export const GraphicsContext = createContext<Option<Graphics2D>>(None);
 
 export function useDraw2d(
-  drawing: (context: CanvasRenderingContext2D) => void
+  drawing: (graphics: Graphics2D) => void
 ): ReactElement {
   const context = useContext(GraphicsContext);
 

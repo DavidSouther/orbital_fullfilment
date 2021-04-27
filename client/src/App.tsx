@@ -1,5 +1,4 @@
 import { MouseEventHandler, useState } from "react";
-import "./App.css";
 import { Background } from "./render/Background";
 import { Canvas } from "./render/Canvas";
 import { Circle } from "./render/Circle";
@@ -22,15 +21,27 @@ function App() {
 
   return (
     <div className="App">
-      <header className="App-header">
-        <Canvas title="render stage" onClick={updateCenter}>
-          <Background color={color}></Background>
-          <Circle center={center} radius={30} color="green"></Circle>
-        </Canvas>
-        <button onClick={() => setColor("red")}>Red</button>
-        <button onClick={() => setColor("yellow")}>Yellow</button>
-        <button onClick={() => setColor("blue")}>Blue</button>
-      </header>
+      <Canvas
+        className="absolute inset-0"
+        title="render stage"
+        onClick={updateCenter}
+      >
+        <Background color={color}></Background>
+        <Circle center={center} radius={30} color="green"></Circle>
+      </Canvas>
+      <div className="fixed bottom-2 inset-x-5 container">
+        <div className="flex flex-row flex-1 justify-around bg-black text-white shadow-xl">
+          <button className="w-24" onClick={() => setColor("red")}>
+            Red
+          </button>
+          <button className="w-24" onClick={() => setColor("yellow")}>
+            Yellow
+          </button>
+          <button className="w-24" onClick={() => setColor("blue")}>
+            Blue
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
