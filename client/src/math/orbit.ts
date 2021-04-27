@@ -10,6 +10,13 @@ export interface Orbit {
   meanLongitude: C.Angle;
 }
 
+export interface Correction {
+  s: number;
+  b: number;
+  c: number;
+  f: number;
+}
+
 export interface StateVector {
   position: V.Position;
   velocity: V.Velocity;

@@ -26,8 +26,8 @@ export const DEGREE: Angle = 1;
 export const g: Acceleration = 9.8 * METER; // m / ss
 
 export type Some<T> = T;
-export type None = null;
-export type Maybe<T> = Some<T> | None;
+export const None = null;
+export type Option<T> = Some<T> | typeof None;
 
 export type Entries<T> = { [K in keyof T]: [K, T[K]] }[keyof T][];
 export function entries<T>(t: T): Entries<T> {

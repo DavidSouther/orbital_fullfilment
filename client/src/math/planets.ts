@@ -7,7 +7,7 @@ export const Saturn: [O.Orbit, O.Orbit, O.Correction] = [
     eccentricity: 0.0541,
     inclination: 2.48466 * C.DEGREE,
     ascendingLongitude: 113.7154 * C.DEGREE,
-    perihelion: 92.86136 * C.DEGREE,
+    periapsis: 92.86136 * C.DEGREE,
     meanLongitude: 50.07571329,
   },
   {
@@ -15,10 +15,10 @@ export const Saturn: [O.Orbit, O.Orbit, O.Correction] = [
     eccentricity: -0.00032044,
     inclination: 0.00451969,
     ascendingLongitude: -0.25015002,
-    perihelion: 0.54179478,
+    periapsis: 0.54179478,
     meanLongitude: 1222.11494724,
   },
-  [0.00025899, -0.13434469, 0.87320147, 38.35125],
+  {s: 0.00025899, b: -0.13434469, c: 0.87320147, f: 38.35125},
 ];
 
 export const Earth: O.Orbit = {
@@ -27,6 +27,6 @@ export const Earth: O.Orbit = {
   eccentricity: 0.01671022,
   inclination: 0.00005 * C.DEGREE,
   ascendingLongitude: -11.26064 * C.DEGREE,
-  perihelion: (102.94719 - -11.26064) * C.DEGREE,
+  periapsis: (102.94719 - -11.26064) * C.DEGREE,
   meanLongitude: 0,
 };
