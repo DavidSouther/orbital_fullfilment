@@ -5,8 +5,8 @@ import * as V from "./vector";
 import * as S from "./solver";
 
 // Co-centric circular orbit constant thrust intersection
-const earth0 = O.positionOnOrbit(P.Earth.orbit)(0);
-const saturn0 = O.positionOnOrbit(P.Saturn.orbit)(0);
+const earth0 = O.positionOnOrbit(P.Earth)(0);
+const saturn0 = O.positionOnOrbit(P.Saturn)(0);
 const minimumDistance = V.delta(earth0, saturn0) / C.AU;
 console.log(`Minimum distance: ${minimumDistance} AU`);
 

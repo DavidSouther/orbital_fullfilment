@@ -38,7 +38,7 @@ export function Perihelion(orbit: Orbit) {
 }
 
 export function MeanAnomaly(orbit: Orbit): C.Angle {
-    return (orbit.meanLongitude - Perihelion(orbit);
+    return orbit.meanLongitude - Perihelion(orbit);
 }
 
 export function EccentricAnomaly(orbit: Orbit) {
