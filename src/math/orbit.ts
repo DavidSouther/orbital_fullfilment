@@ -5,18 +5,17 @@ export interface Body {
   mass: C.Mass;
 }
 
-export interface Orbit {
+export interface KeplerOrbitElements {
+  a: typeof C.METER; // Semi-major axis
+  e: C.Dimensionless; // Eccentricity
+  w: typeof C.RADIAN; // Argument of Periapsis
+  l: typeof C.RADIAN; // Longitude of Ascending Node
+  i: typeof C.RADIAN; // Inclination
+  m: typeof C.RADIAN; // Mean Anomaly
+}
+
+export interface Orbital {
   body: Body;
-  semimajorAxis: C.Length;
-  eccentricity: C.Dimensionless;
-  inclination: C.Angle;
-  ascending: C.Angle;
-  periapsis: C.Angle;
-  /*
-  trueAnomaly: C.Angle;
-  meanAnomaly: number;
-  eccentricAnomaly: number;
-  */
   period: number;
   position(t: C.Time): V.Position;
 }
@@ -27,7 +26,45 @@ function period(semimajorAxis: number, body: Body) {
   return C.TAU * Math.sqrt(a ** 3 / mu);
 }
 
-export class PlanetaryOrbit implements Orbit {
+export class StateOrbit implements Orbital, KeplerOrbitElements {
+  readonly a: typeof C.METER; // Semi-major axis
+  readonly e: C.Dimensionless; // Eccentricity
+  readonly w: typeof C.RADIAN; // Argument of Periapsis
+  readonly l: typeof C.RADIAN; // Longitude of Ascending Node
+  readonly i: typeof C.RADIAN; // Inclination
+  readonly m: typeof C.RADIAN; // Mean Anomaly
+  constructor(readonly body: Body, { position, velocity }: StateVector) {
+    const mu = body.mass * C.G;
+    const momentum = V.asXYZ(V.cross(position, velocity));
+    const eccentricity = V.sub(
+      V.scale(V.cross(velocity, momentum), 1 / mu),
+      V.scale(position, V.len(position))
+    );
+    const node = { x: -momentum.y, y: momentum.x, z: 0 };
+    const dotER = V.dot(position, velocity);
+    let v = Math.acos(dotER / (V.len(eccentricity) * V.len(position)));
+    if (dotER < 0) v = C.TAU - v;
+    const i = Math.acos(momentum.z / V.len(momentum));
+    const e = V.asRTP(eccentricity).r;
+    const E = 2 * Math.atan(Math.tan(v / 2) / Math.sqrt((1 + e) / (1 - e)));
+    let l = Math.acos(node.x / V.asRTP(node).r);
+    if (node.y < 0) l = C.TAU - l;
+    const w = Math.acos(
+      V.dot(node, eccentricity) / (V.asRTP(node).r * V.len(eccentricity))
+    );
+    const a = 1 / (2 / V.len(position) - V.len(velocity) ** 2 / mu);
+    const m = E - e * Math.sin(E);
+
+    this.a = a;
+    this.e = e;
+    this.w = w;
+    this.l = l;
+    this.i = i;
+    this.m = m;
+  }
+}
+
+export class PlanetaryOrbit implements Orbital {
   get body() {
     return this.params.body;
   }
@@ -77,18 +114,20 @@ export class PlanetaryOrbit implements Orbit {
     const yp = a * (Math.sqrt(1 - e ** 2) * Math.sin(E));
 
     // 3D
-    /*
     const i = this.inclination + this.params.deltas.inclination * t;
     const o = this.ascending + this.params.deltas.ascending * t;
     const w = p - o;
     const cos = Math.cos;
     const sin = Math.sin;
-    const x = (cos(w)*cos(o)-sin(w)*sin(o)*cos(i)) * xp + (- sin(w)*cos(o) - cos(w)*sin(o)*cos(i)) * yp;
-    const y = (cos(w)*sin(o)+sin(w)*cos(o)*cos(i)) * xp + (- sin(w)*sin(o) - cos(w)*cos(o)*cos(i)) * yp;
-    const z = sin(w)* sin(i) * xp + cos(w) * sin(i) * yp;
-    */
+    const x =
+      (cos(w) * cos(o) - sin(w) * sin(o) * cos(i)) * xp +
+      (-sin(w) * cos(o) - cos(w) * sin(o) * cos(i)) * yp;
+    const y =
+      (cos(w) * sin(o) + sin(w) * cos(o) * cos(i)) * xp +
+      (-sin(w) * sin(o) - cos(w) * cos(o) * cos(i)) * yp;
+    const z = sin(w) * sin(i) * xp + cos(w) * sin(i) * yp;
 
-    return { x: xp * C.AU, y: yp * C.AU };
+    return { x: x * C.AU, y: y * C.AU, z: z * C.AU };
   }
 }
 
@@ -141,17 +180,21 @@ export interface Ellipse {
   rotation: number;
 }
 
-export const toEllipse = (orbit: Orbit): Ellipse => {
-  const e = orbit.eccentricity;
-  const a = orbit.semimajorAxis * C.AU;
+export const toEllipse = (
+  eccentricity: number,
+  semimajorAxis: number,
+  periapsis: number
+): Ellipse => {
+  const e = eccentricity;
+  const a = semimajorAxis * C.AU;
   const b = Math.sqrt((1 - e ** 2) * a ** 2);
   const radiusX = 2 * a;
   const radiusY = 2 * b;
   const c = Math.sqrt(a ** 2 + b ** 2);
 
   // For now, the rotation is the longitude of perihelion
-  const rotation = orbit.periapsis / C.RADIAN;
+  const rotation = periapsis / C.RADIAN;
   // center is at (-c, 0). Rotate it through rotation degrees.
-  const { x, y } = V.asXY({ r: -c, t: rotation });
+  const { x, y } = V.asXYZ({ r: -c, t: rotation, p: Math.PI / 2 });
   return { x, y, radiusX, radiusY, rotation };
 };

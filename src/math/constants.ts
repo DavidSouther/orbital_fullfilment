@@ -6,6 +6,7 @@ export type Angle = number;
 export type Length = number;
 export type Mass = Positive;
 export type Time = number;
+
 export type Speed = number; // Meters / Second
 export type Acceleration = number; // Velocity / Second, Meters / Second ** 2
 export type Newton = number; // Mass * Acceleration

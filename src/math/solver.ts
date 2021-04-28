@@ -24,7 +24,7 @@ export function intersect(vessel: F.Vessel, body: Body): F.FlightPath {
 export function travelTime(distance: V.Vector, a: number, v0 = 0): number {
   // v**2 = v0**2 + 2 a dx
   // t = 2 * dx / (v + v0)
-  const dx = V.asRT(distance).r;
+  const dx = V.asRTP(distance).r;
   const v = Math.sqrt(v0 ** 2 + 2 * a * dx);
   const t = (2 * dx) / (v + v0);
   return t;
@@ -35,7 +35,7 @@ export function timeBetween(
   b: V.Position,
   acceleration: number
 ) {
-  const halfway = V.scale(V.subtract(a, b), 1 / 2);
+  const halfway = V.scale(V.sub(a, b), 1 / 2);
   const time = travelTime(halfway, acceleration) * 2;
   return time;
 }
