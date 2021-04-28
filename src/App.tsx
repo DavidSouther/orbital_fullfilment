@@ -1,46 +1,33 @@
-import { MouseEventHandler, useState } from "react";
 import { Background } from "./render/Background";
 import { Canvas } from "./render/Canvas";
-import { Circle } from "./render/Circle";
+import "./math/main";
+import { Earth, Mars, Mercury, Venus } from "./math/planets";
+import { Star } from "./render/Star";
+import { Planet } from "./render/Planet";
+import { AnimationTimer } from "./render/Animation";
+import { useState } from "react";
+import { DAY, HOUR, MINUTE } from "./math/constants";
 
 function App() {
-  const [color, setColor] = useState("yellow");
-  const [center, setCenter] = useState<{ x: number; y: number }>({
-    x: 100,
-    y: 50,
-  });
-
-  const updateCenter: MouseEventHandler<HTMLCanvasElement> = (click) => {
-    const {
-      left,
-      top,
-    } = (click.target as HTMLCanvasElement).getBoundingClientRect();
-    const { clientX: x, clientY: y } = click;
-    setCenter({ x: x - left, y: y - top });
-  };
+  const [tick, setTick] = useState<number>(0);
 
   return (
     <div className="App">
-      <Canvas
-        className="absolute inset-0"
-        title="render stage"
-        onClick={updateCenter}
-      >
-        <Background color={color}></Background>
-        <Circle center={center} radius={30} color="green"></Circle>
-      </Canvas>
-      <div className="fixed bottom-2 inset-x-5 container">
-        <div className="flex flex-row flex-1 justify-around bg-black text-white shadow-xl">
-          <button className="w-24" onClick={() => setColor("red")}>
-            Red
-          </button>
-          <button className="w-24" onClick={() => setColor("yellow")}>
-            Yellow
-          </button>
-          <button className="w-24" onClick={() => setColor("blue")}>
-            Blue
-          </button>
-        </div>
+      <AnimationTimer.Provider value={tick}>
+        <Canvas className="absolute inset-0" title="render stage">
+          <Background color="black"></Background>
+          <Star color="yellow"></Star>
+          <Planet planet={Mercury} color="gray"></Planet>
+          <Planet planet={Venus} color="tan"></Planet>
+          <Planet planet={Earth} color="blue"></Planet>
+          <Planet planet={Mars} color="red"></Planet>
+        </Canvas>
+      </AnimationTimer.Provider>
+      <div className="fixed text-black bg-white">
+        <button onClick={() => setTick(tick + 1 * MINUTE)}>One Minute</button>
+        <button onClick={() => setTick(tick + 1 * HOUR)}>One Hour</button>
+        <button onClick={() => setTick(tick + 1 * DAY)}>One Day</button>
+        <button onClick={() => setTick(tick + 30 * DAY)}>One Month</button>
       </div>
     </div>
   );

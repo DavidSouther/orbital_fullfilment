@@ -6,7 +6,7 @@ import * as F from "./flight";
 // calculate a FlightPath for the Vessel to intersect the Body minimizing dt
 // without exceeding a certain acceleration.
 
-function intersect(vessel: F.Vessel, body: Body): F.FlightPath {
+export function intersect(vessel: F.Vessel, body: Body): F.FlightPath {
   return (t: C.Time) => ({ acceleration: 0, direction: V.XAxis });
 }
 

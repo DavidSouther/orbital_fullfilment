@@ -5,7 +5,7 @@ import { Graphics2D, GraphicsContext } from "./GraphicsContext";
 export const Canvas: FC<{
   title: string;
   className: string;
-  onClick: MouseEventHandler<HTMLCanvasElement>;
+  onClick?: MouseEventHandler<HTMLCanvasElement>;
 }> = (props) => {
   const canvas = useRef<Option<HTMLCanvasElement>>(None);
   const [context, setContext] = useState<Option<Graphics2D>>(None);
