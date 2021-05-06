@@ -1,0 +1,81 @@
+import * as TN from "./typenum";
+
+export type System = TN.Number[];
+
+export type TS = [
+  TN.Number, // Time
+  TN.Number // Distance
+];
+
+export type SI = [
+  TN.Number, // Distance (meters)
+  TN.Number, // Mass (grams)
+  TN.Number, // Time (seconds)
+  TN.Number, // ??? Current
+  TN.Number, // ??? Moles
+  TN.Number, // ???
+  TN.Number // Angle (degrees)
+];
+
+const Z = [[], []];
+type TZ = typeof Z;
+const O = [[0], []];
+type TO = typeof O;
+const TSI: SI = [Z, Z, Z, Z, Z, Z, Z];
+const DSi: System = TSI;
+
+type Dimensionless = [TZ, TZ, TZ, TZ, TZ, TZ, TZ];
+type Distance = [TO, TZ, TZ, TZ, TZ, TZ, TZ];
+type Time = [TZ, TZ, TO, TZ, TZ, TZ, TZ];
+type Mass = [TZ, TO, TZ, TZ, TZ, TZ, TZ];
+type Angle = [TZ, TZ, TZ, TZ, TZ, TZ, TO];
+
+export type Multiply<T extends System, U extends System> = T extends {
+  length: infer NT;
+}
+  ? U extends { length: infer NU }
+    ? NT extends NU
+      ? {
+          [k in keyof T]: k extends keyof U
+            ? T[k] extends TN.Number
+              ? U[k] extends TN.Number
+                ? TN.Add<T[k], U[k]>
+                : never
+              : never
+            : never;
+        }
+      : never
+    : never
+  : never;
+
+export type Divide<T extends System, U extends System> = T extends {
+  length: infer NT;
+}
+  ? U extends { length: infer NU }
+    ? NT extends NU
+      ? {
+          [k in keyof T]: k extends keyof U
+            ? T[k] extends TN.Number
+              ? U[k] extends TN.Number
+                ? TN.Sub<T[k], U[k]>
+                : never
+              : never
+            : never;
+        }
+      : never
+    : never
+  : never;
+
+export type Speed = Divide<Distance, Time>; // Meters / Second
+export type Acceleration = Divide<Speed, Time>; // Meters / Second ** 2
+export type Newton = Multiply<Mass, Acceleration>; // Mass * Acceleration
+
+type Value<D extends System> = { v: number };
+function add<D extends System, T extends Value<D>>(a: T, b: T): Value<D> {
+  return { v: a.v + b.v };
+}
+
+let time: Value<Time> = { v: 10 };
+let distance: Value<Distance> = { v: 20 };
+time = distance;
+add(time, distance);

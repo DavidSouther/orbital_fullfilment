@@ -171,7 +171,7 @@ const one_km_sq = mul(one_km, one_km);
 const one_degree = { unit: Units.Degree, value: 1 } as Unit<
   typeof Units.Degree
 >;
-add(one_km, one_degree); // Type '"Degree"' is not assignable to type '"Kilometer"'.ts(2345)
+// add(one_km, one_degree); // Type '"Degree"' is not assignable to type '"Kilometer"'.ts(2345)
 const two_km = div(one_km_sq, one_km); // Type is Unit<`Kilometer*Kilometer/${string}`, couldn't get reduction unit
 type km = typeof one_km.unit;
 type sq = typeof one_km_sq.unit; // Type is Kilometer*Kilometer

@@ -12,7 +12,7 @@ export interface FlightPath {
 }
 
 export interface Body {
-  orbit: O.Orbit;
+  orbit: O.Orbital;
 }
 
 export interface Vessel {

@@ -27,6 +27,8 @@ function period(semimajorAxis: number, body: Body) {
 }
 
 export class StateOrbit implements Orbital, KeplerOrbitElements {
+  period: number;
+
   readonly a: typeof C.METER; // Semi-major axis
   readonly e: C.Dimensionless; // Eccentricity
   readonly w: typeof C.RADIAN; // Argument of Periapsis
@@ -61,10 +63,55 @@ export class StateOrbit implements Orbital, KeplerOrbitElements {
     this.l = l;
     this.i = i;
     this.m = m;
+
+    this.period = period(a, body);
+  }
+
+  position(t: C.Time): V.Position {
+    // t is in centuries past 2000
+    t = t / C.CENTURY;
+    const { a, e, l, w, i } = this;
+
+    const M = l - w;
+    const E = EccentricAnomaly(M, e);
+
+    const xp = a * (Math.cos(E) - e);
+    const yp = a * (Math.sqrt(1 - e ** 2) * Math.sin(E));
+
+    // 3D
+    const cos = Math.cos;
+    const sin = Math.sin;
+    const x =
+      (cos(w) * cos(l) - sin(w) * sin(l) * cos(i)) * xp +
+      (-sin(w) * cos(l) - cos(w) * sin(l) * cos(i)) * yp;
+    const y =
+      (cos(w) * sin(l) + sin(w) * cos(l) * cos(i)) * xp +
+      (-sin(w) * sin(l) - cos(w) * cos(l) * cos(i)) * yp;
+    const z = sin(w) * sin(i) * xp + cos(w) * sin(i) * yp;
+
+    return { x: x * C.AU, y: y * C.AU, z: z * C.AU };
   }
 }
 
-export class PlanetaryOrbit implements Orbital {
+export class PlanetaryOrbit implements Orbital, KeplerOrbitElements {
+  get a() {
+    return this.semimajorAxis;
+  }
+  get e() {
+    return this.eccentricity;
+  }
+  get w() {
+    return this.periapsis;
+  }
+  get l() {
+    return this.ascending;
+  }
+  get i() {
+    return this.inclination;
+  }
+  get m() {
+    return this.meanLongitude;
+  }
   get body() {
     return this.params.body;
   }
@@ -180,11 +227,11 @@ export interface Ellipse {
   rotation: number;
 }
 
-export const toEllipse = (
-  eccentricity: number,
-  semimajorAxis: number,
-  periapsis: number
-): Ellipse => {
+export const toEllipse = ({
+  e: eccentricity,
+  a: semimajorAxis,
+  w: periapsis,
+}: KeplerOrbitElements): Ellipse => {
   const e = eccentricity;
   const a = semimajorAxis * C.AU;
   const b = Math.sqrt((1 - e ** 2) * a ** 2);

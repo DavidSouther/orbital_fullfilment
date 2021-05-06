@@ -1,14 +1,14 @@
 import { FC, useContext } from "react";
 import { AU, TAU } from "../math/constants";
-import { Orbit, toEllipse } from "../math/orbit";
+import { Orbital, KeplerOrbitElements, toEllipse } from "../math/orbit";
 import { add, asXYZ, scale } from "../math/vector";
 import { AnimationTimer } from "./Animation";
 import { useDraw2d } from "./GraphicsContext";
 
-export const Planet: FC<{ planet: Orbit; color: string }> = ({
-  planet,
-  color,
-}) => {
+export const Planet: FC<{
+  planet: KeplerOrbitElements & Orbital;
+  color: string;
+}> = ({ planet, color }) => {
   const tick = useContext<number>(AnimationTimer);
   return useDraw2d(({ context, props: { height, width } }) => {
     const factor = Math.min(height, width) / (4 * AU);
